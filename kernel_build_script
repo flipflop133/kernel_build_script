@@ -1,0 +1,94 @@
+#!/bin/bash
+
+#########################
+#                       #
+#  kernel build script  #
+#                       #
+#########################
+
+#start the build
+clear
+echo -e "\e[1;31mstarting build\e[0m"
+sleep 5s
+
+clear
+
+#Point the Makefile to your compiler (run this from within the toolchain folder!!)
+echo -e "\e[1;31mpointing makefile to compiler\e[0m"
+sleep 5s
+export CROSS_COMPILE=$(pwd)/build-tools-gcc/aarch64-linux-gnu/bin/aarch64-linux-gnu-
+
+clear
+
+#move to kernel folder
+echo -e "\e[1;31mmoving to kernel folder\e[0m"
+sleep 5s
+cd flipflop
+
+clear
+
+#Tell the Makefile the architecture of the device
+echo -e "\e[1;31mtelling makefile architecture\e[0m"
+sleep 5s
+export ARCH=arm64 && export SUBARCH=arm64
+
+clear
+
+#clean kernel folder
+echo -e "\e[1;31mcleaning\e[0m"
+sleep 5s
+make clean && make mrproper
+
+clear
+
+#Locate your proper defconfig
+echo -e "\e[1;31mmake defconfig\e[0m"
+sleep 5s
+make flipflop_defconfig
+
+clear
+
+#build the kernel
+echo -e "\e[1;31mbuilding kernel\e[0m"
+sleep 5s
+make -j$(nproc --all)
+sleep 5s
+echo -e "\e[1;31mbuild done!\e[0m"
+
+clear
+
+#move to kernel image
+echo -e "\e[1;31mmoving to kernel image directory\e[0m"
+sleep 5s
+cd arch/arm64/boot
+
+clear
+
+#move kernel image to anykernel3
+echo -e "\e[1;31mmoving kernel image to anykernel directory\e[0m"
+sleep 5s
+mv Image.gz-dtb /run/media/francois/android_data/kernel/AnyKernel3/Image.gz.dtb
+
+clear
+
+#move to anykernel3 directory
+echo -e "\e[1;31mmoving to anykernel directory\e[0m"
+sleep 5s
+cd /run/media/francois/android_data/kernel/AnyKernel3
+
+clear
+
+#clean anykernel3 directory
+echo -e "\e[1;31mcleaning anykernel directory\e[0m"
+sleep 5s
+rm Image.gz.dtb
+clear
+
+#zip the kernel
+echo -e "\e[1;31mzipping kernel\e[0m"
+sleep 5s
+d=$(date '+%F')
+zip -r9 flipflop_$d.zip *
+clear
+sleep 5s
+echo -e "\e[1;31myour zip is ready!\e[0m"
